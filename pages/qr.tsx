@@ -3,14 +3,27 @@
 import { useState } from 'react'
 
 export default function QrPixPage() {
-  const [valor, setValor] = useState('')
+  const [valorFormatado, setValorFormatado] = useState('')
+  const [valorCentavos, setValorCentavos] = useState(0)
   const [qrCodeUrl, setQrCodeUrl] = useState('')
   const [copiaCola, setCopiaCola] = useState('')
   const [carregando, setCarregando] = useState(false)
 
+  const formatarMoeda = (valor: string) => {
+    const somenteNumeros = valor.replace(/\D/g, '')
+    const centavos = parseInt(somenteNumeros || '0', 10)
+    setValorCentavos(centavos / 100)
+
+    const valorFormatado = (centavos / 100).toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    })
+
+    setValorFormatado(valorFormatado)
+  }
+
   const gerarQRCode = async () => {
-    const valorFinal = Number(valor)
-    if (!valorFinal || valorFinal < 1) {
+    if (valorCentavos < 1) {
       alert('Digite um valor válido')
       return
     }
@@ -23,7 +36,7 @@ export default function QrPixPage() {
       const res = await fetch('/api/deposito', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ valor: valorFinal })
+        body: JSON.stringify({ valor: valorCentavos })
       })
 
       const data = await res.json()
@@ -43,16 +56,15 @@ export default function QrPixPage() {
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="bg-white shadow-xl rounded-xl p-8 w-full max-w-md text-center space-y-6">
-        <h1 className="text-3xl font-extrabold text-gray-800">DIGITE O VALOR</h1>
+        <h1 className="text-3xl font-extrabold text-gray-800 uppercase">Digite o valor a pagar</h1>
 
         <input
           type="text"
           inputMode="numeric"
-          pattern="[0-9]*"
-          placeholder="Ex: R$200,00"
+          placeholder="R$ 0,00"
           className="w-full p-4 border rounded-lg text-center text-xl font-semibold text-black outline-none focus:ring-2 focus:ring-blue-400"
-          value={valor}
-          onChange={(e) => setValor(e.target.value.replace(/\D/g, ''))}
+          value={valorFormatado}
+          onChange={(e) => formatarMoeda(e.target.value)}
         />
 
         <button
