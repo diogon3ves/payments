@@ -43,13 +43,13 @@ export default function QrPixPage() {
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="bg-white shadow-xl rounded-xl p-8 w-full max-w-md text-center space-y-6">
-        <h1 className="text-3xl font-extrabold text-gray-400">DIGITE O VALOR A PAGAR</h1>
+        <h1 className="text-3xl font-extrabold text-gray-800">DIGITE O VALOR</h1>
 
         <input
           type="text"
           inputMode="numeric"
           pattern="[0-9]*"
-          placeholder="Ex: 200"
+          placeholder="Ex: R$200,00"
           className="w-full p-4 border rounded-lg text-center text-xl font-semibold text-black outline-none focus:ring-2 focus:ring-blue-400"
           value={valor}
           onChange={(e) => setValor(e.target.value.replace(/\D/g, ''))}
