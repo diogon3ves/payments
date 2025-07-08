@@ -110,29 +110,19 @@ export default function QrPixPage() {
         )}
 
         {exibindoQR && (
-          <div className="space-y-4">
+          <div className="space-y-4 flex flex-col items-center">
             <img
               ref={qrRef}
               src={qrCodeUrl}
               alt="QR Code Pix"
-              className="mx-auto w-48 h-48 cursor-pointer hover:opacity-80 transition"
+              className="w-48 h-48 cursor-pointer hover:opacity-80 transition"
               onClick={copiarImagem}
               title="Clique para copiar imagem"
             />
 
-            <div>
-              <p className="text-sm font-medium text-gray-600 mb-2">Copia e Cola:</p>
-              <textarea
-                className="w-full p-3 border rounded-lg text-sm text-center"
-                value={copiaCola}
-                readOnly
-                rows={3}
-              />
-            </div>
-
             <button
               onClick={copiarPix}
-              className="bg-green-600 text-white px-6 py-2 rounded-lg w-full hover:bg-green-700 transition font-medium"
+              className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition font-medium w-48"
             >
               Copiar chave Pix
             </button>
