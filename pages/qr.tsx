@@ -10,8 +10,8 @@ export default function QrPixPage() {
 
   const gerarQRCode = async () => {
     const valorFinal = Number(valor)
-    if (!valorFinal || valorFinal < 15 || valorFinal > 10000) {
-      alert('Digite um valor entre R$15 e R$10.000')
+    if (!valorFinal || valorFinal < 1) {
+      alert('Digite um valor válido')
       return
     }
 
@@ -23,7 +23,7 @@ export default function QrPixPage() {
       const res = await fetch('/api/deposito', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ valor: valorFinal, userId: 'anonimo' })
+        body: JSON.stringify({ valor: valorFinal })
       })
 
       const data = await res.json()
@@ -45,20 +45,23 @@ export default function QrPixPage() {
       <div className="bg-white shadow-xl rounded-xl p-8 w-full max-w-md text-center space-y-6">
         <h1 className="text-2xl font-bold">Gerar QR Code Pix</h1>
 
-        <input
-          type="number"
-          placeholder="Digite o valor"
-          className="w-full p-3 border rounded-lg text-center"
-          value={valor}
-          onChange={(e) => setValor(e.target.value)}
-        />
+        <div className="text-left">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Digite o valor</label>
+          <input
+            type="number"
+            placeholder="Ex: 200"
+            className="w-full p-3 border rounded-lg text-center"
+            value={valor}
+            onChange={(e) => setValor(e.target.value)}
+          />
+        </div>
 
         <button
           onClick={gerarQRCode}
           disabled={carregando}
-          className="bg-green-600 text-white px-6 py-3 rounded-lg w-full hover:bg-green-700 transition"
+          className="bg-blue-600 text-white px-6 py-3 rounded-lg w-full hover:bg-blue-700 transition font-semibold"
         >
-          {carregando ? 'Gerando...' : 'Gerar QR Code'}
+          {carregando ? 'Gerando...' : 'Gerar PIX'}
         </button>
 
         {qrCodeUrl && (
