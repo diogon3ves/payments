@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { toast } from 'sonner'
+import { toast, Toaster } from 'sonner'
 
 export default function QrPixPage() {
   const [inputValue, setInputValue] = useState('0')
@@ -67,17 +67,31 @@ export default function QrPixPage() {
     toast.success('Chave Pix copiada!')
   }
 
-  const copiarImagem = () => {
-    toast.info('Copiar imagem não é suportado nesse domínio. Segure e salve manualmente.')
+  const copiarImagem = async () => {
+    try {
+      const image = qrRef.current
+      if (!image) throw new Error()
+
+      const data = await fetch(image.src)
+      const blob = await data.blob()
+      await navigator.clipboard.write([
+        new ClipboardItem({ [blob.type]: blob })
+      ])
+
+      toast.success('Imagem copiada!')
+    } catch {
+      toast.error('Erro ao copiar imagem')
+    }
   }
 
   const { reaisFormatado } = formatarReais(inputValue)
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+      <Toaster position="top-center" richColors />
       <div className="bg-white shadow-xl rounded-xl p-8 w-full max-w-md text-center space-y-6">
         <h1 className="text-3xl font-extrabold text-gray-800 uppercase">
-          {exibindoQR ? 'PIX GERADO' : 'Insira o valor'}
+          {exibindoQR ? 'PIX GERADO' : 'INSIRA O VALOR'}
         </h1>
 
         {!exibindoQR && (
