@@ -61,7 +61,7 @@ export default function QrPixPage() {
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="bg-white shadow-xl rounded-xl p-8 w-full max-w-md text-center space-y-6">
-        <h1 className="text-3xl font-extrabold text-gray-800 uppercase">Digite o valor a pagar</h1>
+        <h1 className="text-3xl font-extrabold text-gray-800 uppercase">INSIRA O VALOR</h1>
 
         <input
           type="text"
