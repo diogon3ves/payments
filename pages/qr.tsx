@@ -43,23 +43,22 @@ export default function QrPixPage() {
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="bg-white shadow-xl rounded-xl p-8 w-full max-w-md text-center space-y-6">
-        <h1 className="text-2xl font-bold">Gerar QR Code Pix</h1>
+        <h1 className="text-3xl font-extrabold text-gray-800">Digite o valor</h1>
 
-        <div className="text-left">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Digite o valor</label>
-          <input
-            type="number"
-            placeholder="Ex: 200"
-            className="w-full p-3 border rounded-lg text-center"
-            value={valor}
-            onChange={(e) => setValor(e.target.value)}
-          />
-        </div>
+        <input
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          placeholder="Ex: 200"
+          className="w-full p-4 border rounded-lg text-center text-xl font-semibold text-black outline-none focus:ring-2 focus:ring-blue-400"
+          value={valor}
+          onChange={(e) => setValor(e.target.value.replace(/\D/g, ''))}
+        />
 
         <button
           onClick={gerarQRCode}
           disabled={carregando}
-          className="bg-blue-600 text-white px-6 py-3 rounded-lg w-full hover:bg-blue-700 transition font-semibold"
+          className="bg-blue-600 text-white px-6 py-3 rounded-lg w-full hover:bg-blue-700 transition font-semibold text-lg"
         >
           {carregando ? 'Gerando...' : 'Gerar PIX'}
         </button>
