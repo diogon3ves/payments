@@ -1,12 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 
 export default function QrPixPage() {
   const [inputValue, setInputValue] = useState('0')
   const [qrCodeUrl, setQrCodeUrl] = useState('')
   const [copiaCola, setCopiaCola] = useState('')
   const [carregando, setCarregando] = useState(false)
+  const [exibindoQR, setExibindoQR] = useState(false)
+  const qrRef = useRef<HTMLImageElement | null>(null)
 
   const formatarReais = (value: string) => {
     const numeric = value.replace(/\D/g, '')
@@ -34,6 +36,7 @@ export default function QrPixPage() {
     setCarregando(true)
     setQrCodeUrl('')
     setCopiaCola('')
+    setExibindoQR(false)
 
     try {
       const res = await fetch('/api/deposito', {
@@ -46,6 +49,7 @@ export default function QrPixPage() {
       if (data.qrCodeUrl && data.copiaCola) {
         setQrCodeUrl(data.qrCodeUrl)
         setCopiaCola(data.copiaCola)
+        setExibindoQR(true)
       } else {
         alert('Erro ao gerar QR Code.')
       }
@@ -56,43 +60,92 @@ export default function QrPixPage() {
     }
   }
 
+  const copiarPix = () => {
+    navigator.clipboard.writeText(copiaCola)
+    alert('Chave Pix copiada!')
+  }
+
+  const copiarImagem = async () => {
+    if (!qrRef.current) return
+    try {
+      const response = await fetch(qrCodeUrl)
+      const blob = await response.blob()
+      await navigator.clipboard.write([
+        new window.ClipboardItem({ [blob.type]: blob })
+      ])
+      alert('QR Code copiado como imagem!')
+    } catch (err) {
+      alert('Erro ao copiar imagem')
+    }
+  }
+
   const { reaisFormatado } = formatarReais(inputValue)
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="bg-white shadow-xl rounded-xl p-8 w-full max-w-md text-center space-y-6">
-        <h1 className="text-3xl font-extrabold text-gray-800 uppercase">INSIRA O VALOR</h1>
+        <h1 className="text-3xl font-extrabold text-gray-800 uppercase">
+          {exibindoQR ? 'PIX GERADO' : 'Insira o valor'}
+        </h1>
 
-        <input
-          type="text"
-          inputMode="numeric"
-          placeholder="R$ 0,00"
-          className="w-full p-4 border border-blue-400 rounded-lg text-center text-xl font-semibold text-black outline-none focus:ring-2 focus:ring-blue-400"
-          value={reaisFormatado}
-          onChange={handleChange}
-        />
+        {!exibindoQR && (
+          <>
+            <input
+              type="text"
+              inputMode="numeric"
+              placeholder="R$ 0,00"
+              className="w-full p-4 border border-blue-400 rounded-lg text-center text-xl font-semibold text-black outline-none focus:ring-2 focus:ring-blue-400"
+              value={reaisFormatado}
+              onChange={handleChange}
+            />
 
-        <button
-          onClick={gerarQRCode}
-          disabled={carregando}
-          className="bg-blue-600 text-white px-6 py-3 rounded-lg w-full hover:bg-blue-700 transition font-semibold text-lg"
-        >
-          {carregando ? 'Gerando...' : 'Gerar PIX'}
-        </button>
+            <button
+              onClick={gerarQRCode}
+              disabled={carregando}
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg w-full hover:bg-blue-700 transition font-semibold text-lg"
+            >
+              {carregando ? 'Gerando...' : 'Gerar PIX'}
+            </button>
+          </>
+        )}
 
-        {qrCodeUrl && (
+        {exibindoQR && (
           <div className="space-y-4">
-            <img src={qrCodeUrl} alt="QR Code Pix" className="mx-auto w-48 h-48" />
+            <img
+              ref={qrRef}
+              src={qrCodeUrl}
+              alt="QR Code Pix"
+              className="mx-auto w-48 h-48 cursor-pointer hover:opacity-80 transition"
+              onClick={copiarImagem}
+              title="Clique para copiar imagem"
+            />
+
             <div>
               <p className="text-sm font-medium text-gray-600 mb-2">Copia e Cola:</p>
               <textarea
-                className="w-full p-3 border rounded-lg text-sm"
+                className="w-full p-3 border rounded-lg text-sm text-center"
                 value={copiaCola}
                 readOnly
                 rows={3}
-                onClick={(e) => (e.target as HTMLTextAreaElement).select()}
               />
             </div>
+
+            <button
+              onClick={copiarPix}
+              className="bg-green-600 text-white px-6 py-2 rounded-lg w-full hover:bg-green-700 transition font-medium"
+            >
+              Copiar chave Pix
+            </button>
+
+            <button
+              onClick={() => {
+                setExibindoQR(false)
+                setInputValue('0')
+              }}
+              className="mt-4 text-sm text-blue-600 underline hover:text-blue-800"
+            >
+              Voltar
+            </button>
           </div>
         )}
       </div>
