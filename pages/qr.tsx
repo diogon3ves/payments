@@ -3,27 +3,30 @@
 import { useState } from 'react'
 
 export default function QrPixPage() {
-  const [valorFormatado, setValorFormatado] = useState('')
-  const [valorCentavos, setValorCentavos] = useState(0)
+  const [inputValue, setInputValue] = useState('0')
   const [qrCodeUrl, setQrCodeUrl] = useState('')
   const [copiaCola, setCopiaCola] = useState('')
   const [carregando, setCarregando] = useState(false)
 
-  const formatarMoeda = (valor: string) => {
-    const somenteNumeros = valor.replace(/\D/g, '')
-    const centavos = parseInt(somenteNumeros || '0', 10)
-    setValorCentavos(centavos / 100)
-
-    const valorFormatado = (centavos / 100).toLocaleString('pt-BR', {
+  const formatarReais = (value: string) => {
+    const numeric = value.replace(/\D/g, '')
+    const centavos = parseInt(numeric || '0', 10)
+    const reaisFormatado = (centavos / 100).toLocaleString('pt-BR', {
       style: 'currency',
       currency: 'BRL'
     })
+    return { reaisFormatado, valorNumero: centavos / 100 }
+  }
 
-    setValorFormatado(valorFormatado)
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target
+    const apenasNumeros = value.replace(/\D/g, '')
+    setInputValue(apenasNumeros)
   }
 
   const gerarQRCode = async () => {
-    if (valorCentavos < 1) {
+    const { valorNumero } = formatarReais(inputValue)
+    if (valorNumero < 1) {
       alert('Digite um valor válido')
       return
     }
@@ -36,7 +39,7 @@ export default function QrPixPage() {
       const res = await fetch('/api/deposito', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ valor: valorCentavos })
+        body: JSON.stringify({ valor: valorNumero })
       })
 
       const data = await res.json()
@@ -53,6 +56,8 @@ export default function QrPixPage() {
     }
   }
 
+  const { reaisFormatado } = formatarReais(inputValue)
+
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="bg-white shadow-xl rounded-xl p-8 w-full max-w-md text-center space-y-6">
@@ -62,9 +67,9 @@ export default function QrPixPage() {
           type="text"
           inputMode="numeric"
           placeholder="R$ 0,00"
-          className="w-full p-4 border rounded-lg text-center text-xl font-semibold text-black outline-none focus:ring-2 focus:ring-blue-400"
-          value={valorFormatado}
-          onChange={(e) => formatarMoeda(e.target.value)}
+          className="w-full p-4 border border-blue-400 rounded-lg text-center text-xl font-semibold text-black outline-none focus:ring-2 focus:ring-blue-400"
+          value={reaisFormatado}
+          onChange={handleChange}
         />
 
         <button
