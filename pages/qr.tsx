@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import { toast } from 'sonner'
 
 export default function QrPixPage() {
   const [inputValue, setInputValue] = useState('0')
@@ -29,7 +30,7 @@ export default function QrPixPage() {
   const gerarQRCode = async () => {
     const { valorNumero } = formatarReais(inputValue)
     if (valorNumero < 1) {
-      alert('Digite um valor válido')
+      toast.error('Digite um valor válido')
       return
     }
 
@@ -50,11 +51,12 @@ export default function QrPixPage() {
         setQrCodeUrl(data.qrCodeUrl)
         setCopiaCola(data.copiaCola)
         setExibindoQR(true)
+        toast.success('PIX gerado com sucesso!')
       } else {
-        alert('Erro ao gerar QR Code.')
+        toast.error('Erro ao gerar QR Code.')
       }
     } catch (err) {
-      alert('Erro de conexão.')
+      toast.error('Erro de conexão.')
     } finally {
       setCarregando(false)
     }
@@ -62,21 +64,11 @@ export default function QrPixPage() {
 
   const copiarPix = () => {
     navigator.clipboard.writeText(copiaCola)
-    alert('Chave Pix copiada!')
+    toast.success('Chave Pix copiada!')
   }
 
-  const copiarImagem = async () => {
-    if (!qrRef.current) return
-    try {
-      const response = await fetch(qrCodeUrl)
-      const blob = await response.blob()
-      await navigator.clipboard.write([
-        new window.ClipboardItem({ [blob.type]: blob })
-      ])
-      alert('QR Code copiado como imagem!')
-    } catch (err) {
-      alert('Erro ao copiar imagem')
-    }
+  const copiarImagem = () => {
+    toast.info('Copiar imagem não é suportado nesse domínio. Segure e salve manualmente.')
   }
 
   const { reaisFormatado } = formatarReais(inputValue)
